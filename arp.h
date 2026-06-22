@@ -1,9 +1,17 @@
+#ifndef ARP_H
+# define ARP_H
+
+#include <net/if.h>
+#include <string.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
-
+#include <errno.h>
+#include <arpa/inet.h>
+#include <netpacket/packet.h>
 
 typedef struct s_ARP
 {
@@ -31,3 +39,19 @@ typedef struct s_frame
 	t_ETH	header;
 	t_ARP	pkg_arp;
 } __attribute__((packed)) t_frame;
+
+//root.c
+void	check_root();
+
+//error.c
+void invalid_mac(char *str);
+void invalid_ip(char *str);
+void	not_root();
+void invalid_inputs();
+void	helper();
+
+void get_ipv4(char *str, t_frame *frame, bool who);
+
+void get_mac(char *str, t_frame *frame, bool who);
+
+#endif
