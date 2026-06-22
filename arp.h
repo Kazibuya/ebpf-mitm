@@ -12,6 +12,8 @@
 #include <errno.h>
 #include <arpa/inet.h>
 #include <netpacket/packet.h>
+#include <linux/bpf.h>
+#include <bpf/libbpf.h>
 
 typedef struct s_ARP
 {
