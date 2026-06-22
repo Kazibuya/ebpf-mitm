@@ -15,6 +15,13 @@
 #include <linux/bpf.h>
 #include <bpf/libbpf.h>
 
+typedef struct s_cleanup
+{
+	struct ring_buffer *rb;
+	struct bpf_link *link;
+	struct bpf_object *obj;
+} t_cleanup;
+
 typedef struct s_ARP
 {
 	uint16_t	htype;

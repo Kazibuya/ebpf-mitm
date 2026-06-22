@@ -19,8 +19,8 @@ int	xdp_prog(struct xdp_md *ctx)
 		return XDP_PASS;
 	if (frame->header.proto != bpf_htons(0x0806))
 		return XDP_PASS;
-	if (frame->pkg_arp.oper != bpf_htons(1))
-		return XDP_PASS;
+	// if (frame->pkg_arp.oper != bpf_htons(1))
+		// return XDP_PASS;
 	t_ARP *pkg = bpf_ringbuf_reserve(&rb, sizeof(t_ARP), 0);
 	if (!pkg)
 		return XDP_PASS;
