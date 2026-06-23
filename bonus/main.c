@@ -95,8 +95,9 @@ int main(int argc, char **argv)
 	int map_fd;
 	t_frame	frame;
 	struct	sigaction sa;
-	t_cleanup cleanup = {NULL, NULL};
+	t_cleanup cleanup;
 
+	memset(&cleanup, 0, sizeof(cleanup));
 	g_cleanup = &cleanup;
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = sigint_handler;
