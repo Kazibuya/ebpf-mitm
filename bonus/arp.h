@@ -1,6 +1,14 @@
 #ifndef ARP_H
 # define ARP_H
 
+#include <string.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <ifaddrs.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/if_link.h>
 #include <net/if.h>
 #include <string.h>
 #include <stdbool.h>
@@ -20,7 +28,10 @@ typedef struct s_cleanup
 	struct ring_buffer *rb;
 	struct bpf_link *link;
 	struct bpf_object *obj;
+	char	ifname[IF_NAMESIZE];
 } t_cleanup;
+
+extern t_cleanup *g_cleanup;
 
 typedef struct s_ARP
 {
@@ -62,5 +73,7 @@ void	helper();
 void get_ipv4(char *str, t_frame *frame, bool who);
 
 void get_mac(char *str, t_frame *frame, bool who);
+
+void get_ifname();
 
 #endif

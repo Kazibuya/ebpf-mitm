@@ -31,7 +31,7 @@ void load_hook(int *map_fd)
 		perror("bpf_object__find_program_by_name");
 		exit(1);
 	}
-	g_cleanup->link = bpf_program__attach_xdp(prog, if_nametoindex("enp0s3"));
+	g_cleanup->link = bpf_program__attach_xdp(prog, if_nametoindex(g_cleanup->ifname));
 	if (!g_cleanup->link)
 	{
 		bpf_object__close(g_cleanup->obj);
@@ -66,7 +66,7 @@ int	callback(void *ctx, void *data, size_t size)
 	memset(&addr, 0, sizeof(addr));
 	addr.sll_family = AF_PACKET;
 	addr.sll_protocol = frame->header.proto;
-	addr.sll_ifindex = if_nametoindex("enp0s3");
+	addr.sll_ifindex = if_nametoindex(g_cleanup->ifname);
 	printf("envoi reply\n");
 	int res = sendto(ret, frame, sizeof(t_frame), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_ll));
 	close(ret);
@@ -105,6 +105,7 @@ int main(int argc, char **argv)
 	if (argc != 5)
 		helper();
 	memset(&frame, 0, sizeof(frame));
+	get_ifname();
 	get_ipv4(argv[1], &frame, true);
 	get_ipv4(argv[3], &frame, false);
 	get_mac(argv[2], &frame, true);
@@ -123,6 +124,7 @@ int main(int argc, char **argv)
 		helper();
 	}
 	while (ring_buffer__poll(g_cleanup->rb, -1) == 0);
+	bpf_object__close(g_cleanup->obj);
 	bpf_link__destroy(g_cleanup->link);
 	ring_buffer__free(g_cleanup->rb);
 	return (0);
