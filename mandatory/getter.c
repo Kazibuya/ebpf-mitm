@@ -1,23 +1,29 @@
 #include "arp.h"
-#include <arpa/inet.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <linux/if_link.h>
+
+void	get_data(t_frame *frame, t_frame *input_arp, char *ifname, char **argv)
+{
+	ft_memset(frame, 0, sizeof(t_frame));
+	ft_memset(input_arp, 0, sizeof(t_frame));
+	get_ifname(ifname);
+	get_ipv4(argv[1], frame, true);
+	get_ipv4(argv[3], frame, false);
+	get_mac(argv[2], frame, true);
+	get_mac(argv[4], frame, false);
+	frame->header.proto = htons(0x0806);
+	frame->pkg_arp.hlen = 6;
+	frame->pkg_arp.htype = htons(1);
+	frame->pkg_arp.oper = htons(2);
+	frame->pkg_arp.plen = 4;
+	frame->pkg_arp.ptype = htons(0x0800);
+
+}
 
 void	get_ifname(char *ifname)
 {
 	struct ifaddrs *ifap;
 
 	if (getifaddrs(&ifap) == -1)
-	{
-		perror("getifaddrs");
-		exit(EXIT_FAILURE);
-	}
+		fatal_error("getifaddrs");
 	for (struct ifaddrs *ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
 	{
 		if ((ifa->ifa_flags & IFF_UP) 
@@ -25,12 +31,12 @@ void	get_ifname(char *ifname)
 				&& ifa->ifa_addr 
 				&& ifa->ifa_addr->sa_family == AF_INET)
 		{
-			strcpy(ifname, ifa->ifa_name);
+			ft_strlcpy(ifname, ifa->ifa_name, IF_NAMESIZE);
 			break;
 		}
 	}
 	if (ifname[0] == '\0')
-		helper();
+		fatal_error("ifname");
 	freeifaddrs(ifap);
 }
 
@@ -55,7 +61,7 @@ void get_mac(char *str, t_frame *frame, bool who)
 	int	len = 0;
 
 	valided_zone = sscanf(str, "%x:%x:%x:%x:%x:%x%n", &tmp[0], &tmp[1], &tmp[2], &tmp[3], &tmp[4], &tmp[5], &len);
-	if (valided_zone != 6 || len != (int)strlen(str))
+	if (valided_zone != 6 || len != (int)ft_strlen(str))
 		invalid_mac(str);
 	for (int i = 0; i < 6 ; ++i)
 	{

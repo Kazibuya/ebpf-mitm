@@ -4,7 +4,7 @@ CFLAGS  := -Wall -Wextra -Werror
 NAME    := ft_malcolm
 
 MAN_DIR  := mandatory
-MAN_SRCS := main.c error.c getter.c
+MAN_SRCS := main.c error.c getter.c utils.c
 MAN_OBJS := $(addprefix $(MAN_DIR)/, $(MAN_SRCS:.c=.o))
 
 BON_DIR  := bonus
@@ -15,7 +15,7 @@ XDP      := $(BON_DIR)/xdp_prog.o
 all: mandatory
 
 mandatory: $(MAN_OBJS)
-	$(CC) $(MAN_OBJS) -lbpf -o $(NAME)
+	$(CC) $(MAN_OBJS) -o $(NAME)
 
 $(MAN_DIR)/%.o: $(MAN_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

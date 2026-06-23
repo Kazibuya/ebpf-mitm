@@ -1,27 +1,18 @@
 #ifndef ARP_H
 # define ARP_H
 
+#include <stdio.h>
+#include <signal.h>
+#include <ifaddrs.h>
 #include <net/if.h>
-#include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <stdint.h>
-#include <errno.h>
 #include <arpa/inet.h>
 #include <netpacket/packet.h>
-#include <linux/bpf.h>
-#include <bpf/libbpf.h>
 
-typedef struct s_global
-{
-    int     sock;
-    char    ifname[IF_NAMESIZE];
-} t_global;
-
-extern t_global g_data;
+extern int g_sock;
 
 typedef struct s_ARP
 {
@@ -50,18 +41,20 @@ typedef struct s_frame
 	t_ARP	pkg_arp;
 } __attribute__((packed)) t_frame;
 
-
-//error.c
 void invalid_mac(char *str);
 void invalid_ip(char *str);
-void	not_root();
-void invalid_inputs();
-void	helper();
-
-//getter.c
+void not_root();
+void fatal_error(char *msg);
+void helper();
+void get_data(t_frame *frame, t_frame *input_arp, char *ifname, char **argv);
+void get_ifname(char *ifname);
 void get_ipv4(char *str, t_frame *frame, bool who);
 void get_mac(char *str, t_frame *frame, bool who);
-void get_ifname(char *ifname);
-void	check_root();
+void check_root();
+size_t ft_strlen(const char *theString);
+size_t ft_strlcpy(char *dst, const char *src, size_t size);
+void *ft_memset(void *dest, int c, size_t count);
+void *ft_memcpy(void *dst, const void *src, size_t n);
+
 
 #endif
