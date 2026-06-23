@@ -1,10 +1,12 @@
 #include "arp.h"
+#include <stdio.h>
 
 void	get_data(t_frame *frame, t_frame *input_arp, char *ifname, char **argv)
 {
 	ft_memset(frame, 0, sizeof(t_frame));
 	ft_memset(input_arp, 0, sizeof(t_frame));
 	get_ifname(ifname);
+	printf("Found available interface: %s\n", ifname);
 	get_ipv4(argv[1], frame, true);
 	get_ipv4(argv[3], frame, false);
 	get_mac(argv[2], frame, true);

@@ -1,24 +1,38 @@
 #include "arp.h"
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <stdio.h>
 
 int g_sock = -1;
 
 static void	callback(void *ctx, void *data, char *ifname)
 {
+	char	ip_str[INET_ADDRSTRLEN];
 	struct sockaddr_ll addr;
 	t_frame *frame = (t_frame *)ctx;
 	t_frame *request = (t_frame *)data;
 
-	printf("hook request arp\n");
 	ft_memcpy(frame->header.dst, request->pkg_arp.sha, 6);
 	ft_memcpy(frame->pkg_arp.tha, request->pkg_arp.sha, 6);
+	printf("An ARP request has been broadcast...\n");
+	inet_ntop(AF_INET, &request->pkg_arp.spa, ip_str, INET_ADDRSTRLEN);
+	printf("IP address of request: %s\n", ip_str);
+	printf("Mac address of request: %02x:%02x:%02x:%02x:%02x:%02x\n",
+			request->pkg_arp.sha[0],
+			request->pkg_arp.sha[1],
+			request->pkg_arp.sha[2],
+			request->pkg_arp.sha[3],
+			request->pkg_arp.sha[4],
+			request->pkg_arp.sha[5]);
 	ft_memset(&addr, 0, sizeof(addr));
 	addr.sll_family = AF_PACKET;
 	addr.sll_protocol = frame->header.proto;
 	addr.sll_ifindex = if_nametoindex(ifname);
-	printf("envoi reply\n");
+	printf("Now sending...\n");
 	int res = sendto(g_sock, frame, sizeof(t_frame), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_ll));
 	if (res < 0)
 		fatal_error("socket");
+	printf("Sent an ARP reply...\n");
 }
 
 static void	sigint_handler(int sig)
@@ -58,5 +72,6 @@ int main(int argc, char **argv)
 		}
 	}
 	close(g_sock);
+	printf("Exiting program...\n");
 	return (0);
 }
