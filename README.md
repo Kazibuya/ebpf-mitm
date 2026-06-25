@@ -1,6 +1,7 @@
 # ft_malcolm
 
 > ARP spoofing tool, an introduction to Man in the Middle attacks.
+> ⚠️ This tool is intended for educational purposes only, in a controlled environment (virtual machine). Only spoof IPs that belong to you. Unauthorized use on third-party networks is illegal.
 
 ## Overview
 
