@@ -10,7 +10,8 @@ MAN_OBJS := $(addprefix $(MAN_DIR)/, $(MAN_SRCS:.c=.o))
 BON_DIR  := bonus
 BON_SRCS := main.c error.c getter.c
 BON_OBJS := $(addprefix $(BON_DIR)/, $(BON_SRCS:.c=.o))
-XDP      := $(BON_DIR)/xdp_prog.o
+XDP_ONESHOT      := $(BON_DIR)/xdp_prog.o
+XDP_POISON	:= $(BON_DIR)/xdp_prog_poisoning.o
 
 all: mandatory
 
@@ -20,18 +21,22 @@ mandatory: $(MAN_OBJS)
 $(MAN_DIR)/%.o: $(MAN_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-bonus: $(XDP) $(BON_OBJS)
+bonus: $(XDP_ONESHOT) $(XDP_POISON) $(BON_OBJS)
 	$(CC) $(BON_OBJS) -lbpf -o $(NAME)
 
-$(XDP): $(BON_DIR)/xdp_prog.c
+$(XDP_ONESHOT): $(BON_DIR)/xdp_prog.c
 	clang -O2 -g -target bpf -I/usr/include/x86_64-linux-gnu \
-		-c $(BON_DIR)/xdp_prog.c -o $(XDP)
+		-c $(BON_DIR)/xdp_prog.c -o $(XDP_ONESHOT)
+
+$(XDP_POISON): $(BON_DIR)/xdp_prog_poisoning.c
+	clang -O2 -g -target bpf -I/usr/include/x86_64-linux-gnu \
+		-c $(BON_DIR)/xdp_prog_poisoning.c -o $(XDP_POISON)
 
 $(BON_DIR)/%.o: $(BON_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(MAN_OBJS) $(BON_OBJS) $(XDP)
+	$(RM) $(MAN_OBJS) $(BON_OBJS) $(XDP_ONESHOT) $(XDP_POISON)
 
 fclean: clean
 	$(RM) $(NAME)
